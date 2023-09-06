@@ -1,6 +1,6 @@
 # WalletWise: Android Expense Tracker App
 
-![WalletWise Logo](logo.png)
+![WalletWise Logo](/app/src/main/ic_launcher-playstore.png)
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](your_build_url) [![Version](https://img.shields.io/badge/Version-1.0.0-blue)]() [![License](https://img.shields.io/badge/License-MIT-green)]()
 
