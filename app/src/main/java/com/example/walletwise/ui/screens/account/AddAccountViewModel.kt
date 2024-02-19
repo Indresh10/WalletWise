@@ -1,10 +1,9 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walletwise.data.WalletDataRepository
 import com.example.walletwise.data.model.Accounts
-import com.example.walletwise.data.model.ImageType
 import com.example.walletwise.data.model.Transaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

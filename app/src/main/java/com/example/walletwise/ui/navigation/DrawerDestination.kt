@@ -7,9 +7,9 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.walletwise.ui.screens.AboutScreenDestination
-import com.example.walletwise.ui.screens.HistoryDestination
-import com.example.walletwise.ui.screens.SettingScreenDestination
+import com.example.walletwise.ui.screens.extras.AboutScreenDestination
+import com.example.walletwise.ui.screens.extras.SettingScreenDestination
+import com.example.walletwise.ui.screens.transaction.HistoryDestination
 
 data class DrawerItem(
     val title: String,

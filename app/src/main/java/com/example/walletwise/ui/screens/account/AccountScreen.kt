@@ -1,17 +1,18 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.account
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,26 +30,37 @@ import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Money
 import androidx.compose.material.icons.rounded.Wallet
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedFilterChip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,12 +89,34 @@ fun AccountScreen(
     onAdd: (Long) -> Unit,
     onSub: (Long) -> Unit,
     onAmountClick: (Long) -> Unit,
+    onEdit: (Long) -> Unit,
     navigateToAddAccount: () -> Unit,
     viewModel: AccountScreenViewModel = viewModel(factory = ViewModelProvider.factory)
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val balances by viewModel.balances.collectAsStateWithLifecycle()
     val enableDecimal by viewModel.showDecimal.collectAsStateWithLifecycle(initialValue = true)
+    var setDeleteDialog by remember {
+        mutableLongStateOf(-1)
+    }
+    if (setDeleteDialog != -1L) {
+        AlertDialog(
+            onDismissRequest = { setDeleteDialog = -1L },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteAccount(setDeleteDialog)
+                    setDeleteDialog = -1L
+                }) {
+                    Text(text = "Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { setDeleteDialog = -1L }) {
+                    Text(text = "No")
+                }
+            },
+            text = { Text("Delete Account") })
+    }
     AccountSummaryScreen(
         navigateToAddAccount,
         balances,
@@ -90,8 +124,11 @@ fun AccountScreen(
         onAdd,
         onSub,
         enableDecimal,
-        onAmountClick
-    )
+        onAmountClick,
+        onEdit
+    ) {
+        setDeleteDialog = it
+    }
 
 }
 
@@ -103,14 +140,38 @@ private fun AccountSummaryScreen(
     onAdd: (Long) -> Unit,
     onSub: (Long) -> Unit,
     enableDecimal: Boolean,
-    onAmountClick: (Long) -> Unit
+    onAmountClick: (Long) -> Unit,
+    onEdit: (Long) -> Unit,
+    onDelete: (Long) -> Unit
 ) {
     var selected by rememberSaveable {
         mutableIntStateOf(0)
     }
+    var isFabVisible by remember {
+        mutableStateOf(true)
+    }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // Hide FAB
+                if (available.y < -1) {
+                    isFabVisible = false
+                }
+
+                // Show FAB
+                if (available.y > 1) {
+                    isFabVisible = true
+                }
+
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = navigateToAddAccount) {
-            Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add Account")
+        AnimatedVisibility(visible = isFabVisible, enter = scaleIn(), exit = scaleOut()) {
+            FloatingActionButton(onClick = navigateToAddAccount) {
+                Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add Account")
+            }
         }
     }) { paddingValues ->
         Column(
@@ -141,8 +202,11 @@ private fun AccountSummaryScreen(
                 accounts = accounts,
                 onAdd = onAdd,
                 onSub = onSub,
+                onEdit = onEdit,
+                onDelete = onDelete,
                 onAmountClick = onAmountClick,
-                enableDecimal = enableDecimal
+                enableDecimal = enableDecimal,
+                modifier = Modifier.nestedScroll(nestedScrollConnection)
             )
         }
     }
@@ -152,12 +216,13 @@ private fun AccountSummaryScreen(
 @Composable
 fun AccountScreenPreview() {
     WalletWiseTheme {
-        AccountSummaryScreen({}, listOf(Balance("Cash", 5000.0)),
-            listOf(Accounts(0, "Cash", AccountType.Cash.name, 5000.0)), {}, {}, false, {})
+        AccountSummaryScreen(
+            {}, listOf(Balance("Cash", 5000.0)),
+            listOf(Accounts(0, "Cash", AccountType.Cash.name, 5000.0)), {}, {}, false, {}, {}, {}
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceCard(
     balances: List<Balance>,
@@ -183,7 +248,7 @@ fun BalanceCard(
             }) {
                 Text(
                     text = DecimalFormat.getCurrencyInstance(Locale("en", "in"))
-                        .format(it).dropLast(if(enableDecimal) 0 else 3),
+                        .format(it).dropLast(if (enableDecimal) 0 else 3),
                     style = MaterialTheme.typography.displayLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -209,12 +274,13 @@ fun BalanceCard(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AccountsCardList(
     accounts: List<Accounts>,
     onAdd: (Long) -> Unit,
     onSub: (Long) -> Unit,
+    onEdit: (Long) -> Unit,
+    onDelete: (Long) -> Unit,
     onAmountClick: (Long) -> Unit,
     enableDecimal: Boolean,
     modifier: Modifier = Modifier
@@ -226,9 +292,9 @@ fun AccountsCardList(
     }
     AnimatedVisibility(
         visibleState = visible,
-        enter = fadeIn(animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy)),
-        exit = fadeOut(),
-        modifier = modifier
+        enter = slideInVertically(animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy)),
+        exit = slideOutVertically(),
+        modifier = Modifier
     ) {
         LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
             if (accounts.isEmpty())
@@ -236,21 +302,17 @@ fun AccountsCardList(
                     TipRow(message = "Use '+' to Add Accounts")
                 }
             else
-                itemsIndexed(accounts) { index, account ->
+                itemsIndexed(accounts) { _, account ->
                     AccountCard(
                         account = account,
                         onAdd = { onAdd(account.id) },
                         onSub = { onSub(account.id) },
+                        onEdit = { onEdit(account.id) },
+                        onDelete = { onDelete(account.id) },
                         onAmountClick = { onAmountClick(account.id) },
                         enableDecimal = enableDecimal,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
-                            .animateEnterExit(
-                                enter = slideInVertically(animationSpec = spring(
-                                    stiffness = Spring.StiffnessVeryLow,
-                                    dampingRatio = Spring.DampingRatioLowBouncy
-                                ), initialOffsetY = { it * (index + 1) })
-                            )
                     )
                 }
             item {
@@ -261,17 +323,24 @@ fun AccountsCardList(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AccountCard(
     account: Accounts,
     onAdd: () -> Unit,
     onSub: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     onAmountClick: () -> Unit,
     enableDecimal: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier, onClick = onAmountClick) {
+    var isMenuVisible by remember {
+        mutableStateOf(false)
+    }
+    Card(modifier = modifier.combinedClickable(onClick = onAmountClick, onLongClick = {
+        isMenuVisible = true
+    })) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -311,7 +380,7 @@ fun AccountCard(
                 }
                 Text(
                     text = DecimalFormat.getCurrencyInstance(Locale("en", "in"))
-                        .format(account.curAmount).dropLast(if(enableDecimal) 0 else 3),
+                        .format(account.curAmount).dropLast(if (enableDecimal) 0 else 3),
                     style = MaterialTheme.typography.headlineLarge, overflow = TextOverflow.Ellipsis
                 )
                 IconButton(onClick = onSub) {
@@ -322,8 +391,33 @@ fun AccountCard(
                     )
                 }
             }
+            DropdownMenu(
+                expanded = isMenuVisible,
+                onDismissRequest = { isMenuVisible = false },
+                modifier = Modifier.align(
+                    Alignment.End
+                )
+            ) {
+                DropdownMenuItem(text = { Text(text = "Edit") }, onClick = onEdit, leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Edit,
+                        contentDescription = "edit the account details"
+                    )
+                })
+                DropdownMenuItem(
+                    text = { Text(text = "Delete") },
+                    onClick = onDelete,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = "delete the account details"
+                        )
+                    })
+            }
         }
+
     }
+
 }
 
 fun getBalances(balances: List<Balance>): List<Balance> {

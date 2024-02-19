@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.account
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -135,7 +135,7 @@ fun AddAccountScreen(
                 }
             )
             ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                AccountType.values().forEach {
+                AccountType.entries.forEach {
                     DropdownMenuItem(
                         text = { Text(text = it.name) },
                         onClick = {

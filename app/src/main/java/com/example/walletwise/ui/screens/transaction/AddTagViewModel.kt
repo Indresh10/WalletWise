@@ -1,10 +1,8 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.walletwise.R
 import com.example.walletwise.data.WalletDataRepository
 import com.example.walletwise.data.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow

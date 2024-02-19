@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,7 +66,7 @@ fun AddTagScreen(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
         Image(
-            imageVector = ImageType.values()[uiState.icon].res,
+            imageVector = ImageType.entries[uiState.icon].res,
             contentDescription = null,
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
@@ -95,7 +94,7 @@ fun AddTagScreen(
                     )
                     .padding(16.dp)
             ) {
-                itemsIndexed(ImageType.values()) { index,it ->
+                itemsIndexed(ImageType.entries.toTypedArray()) { index, it ->
                     IconButton(
                         onClick = { viewModel.updateIcon(index) }
                     ) {

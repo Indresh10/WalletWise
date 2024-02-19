@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.extras
 
 import android.content.Intent
 import android.net.Uri
@@ -113,7 +113,9 @@ fun AboutScreen(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.compose),
             contentDescription = null,
-            modifier = Modifier.weight(1f).fillMaxWidth()
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
         )
         Text(
             text = "Made With JetPack Compose",

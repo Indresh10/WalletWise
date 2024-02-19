@@ -1,6 +1,5 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.account
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walletwise.data.PreferenceRepository
@@ -35,7 +34,7 @@ class AccountScreenViewModel(
     private fun addTags() {
         viewModelScope.launch {
             if (walletDataRepository.getTagsCount() == 0) {
-                ImageType.values().forEach {
+                ImageType.entries.forEach {
                     walletDataRepository.insertTag(
                         Tag(
                             0,
@@ -63,6 +62,12 @@ class AccountScreenViewModel(
                     )
                 )
             }
+        }
+    }
+
+    fun deleteAccount(accId: Long) {
+        viewModelScope.launch {
+            walletDataRepository.deleteAccount(walletDataRepository.getAccountById(accId))
         }
     }
 }

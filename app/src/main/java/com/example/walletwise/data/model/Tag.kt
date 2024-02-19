@@ -2,6 +2,7 @@ package com.example.walletwise.data.model
 
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Checkroom
@@ -12,7 +13,6 @@ import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.SportsBaseball
 import androidx.compose.material.icons.filled.TravelExplore
@@ -34,7 +34,7 @@ enum class TagType(val type: Boolean) {
 }
 
 enum class ImageType(val res: ImageVector) {
-    Bill(Icons.Filled.ReceiptLong), Cloth(Icons.Filled.Checkroom), Education(Icons.Filled.HistoryEdu),
+    Bill(Icons.AutoMirrored.Filled.ReceiptLong), Cloth(Icons.Filled.Checkroom), Education(Icons.Filled.HistoryEdu),
     Entertainment(Icons.Filled.LiveTv), Gifts(Icons.Filled.CardGiftcard), Food(Icons.Filled.FoodBank),
     Health(Icons.Filled.LocalHospital), Travel(Icons.Filled.TravelExplore), Person(
         Icons.Filled.Person

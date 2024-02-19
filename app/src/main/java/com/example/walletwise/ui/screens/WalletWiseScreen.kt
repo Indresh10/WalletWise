@@ -4,7 +4,6 @@ package com.example.walletwise.ui.screens
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -21,16 +20,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,10 +49,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -66,6 +67,24 @@ import com.example.walletwise.R
 import com.example.walletwise.ui.ViewModelProvider
 import com.example.walletwise.ui.navigation.DrawerListItem
 import com.example.walletwise.ui.navigation.GeneralDrawerItems
+import com.example.walletwise.ui.screens.account.AccountDestination
+import com.example.walletwise.ui.screens.account.AccountScreen
+import com.example.walletwise.ui.screens.account.AddAccountDestination
+import com.example.walletwise.ui.screens.account.AddAccountScreen
+import com.example.walletwise.ui.screens.extras.AboutScreen
+import com.example.walletwise.ui.screens.extras.AboutScreenDestination
+import com.example.walletwise.ui.screens.extras.SettingScreen
+import com.example.walletwise.ui.screens.extras.SettingScreenDestination
+import com.example.walletwise.ui.screens.start.LockScreen
+import com.example.walletwise.ui.screens.start.LockScreenDestination
+import com.example.walletwise.ui.screens.start.WelcomeDestination
+import com.example.walletwise.ui.screens.start.WelcomeScreen
+import com.example.walletwise.ui.screens.transaction.AddTagDestination
+import com.example.walletwise.ui.screens.transaction.AddTagScreen
+import com.example.walletwise.ui.screens.transaction.AddTransactionDestination
+import com.example.walletwise.ui.screens.transaction.AddTransactionScreen
+import com.example.walletwise.ui.screens.transaction.BalanceScreen
+import com.example.walletwise.ui.screens.transaction.HistoryDestination
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,12 +97,24 @@ fun WalletWiseScreen(
     val name by viewmodel.name.collectAsStateWithLifecycle(initialValue = "")
     val navUiState = viewmodel.uiState
     val scope = rememberCoroutineScope()
+    LifecycleEventEffect(event = Lifecycle.Event.ON_STOP) {
+        print("STOP")
+        navController.navigate(LockScreenDestination.route)
+        navController.graph.setStartDestination(LockScreenDestination.route)
+        viewmodel.resetToLockScreen()
+    }
     ModalNavigationDrawer(drawerContent = {
         ModalDrawerSheet {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                IconButton(
+                    onClick = { if (drawerState.isOpen) scope.launch { drawerState.close() } },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Icon(imageVector = Icons.Rounded.Close, contentDescription = "close the drawer")
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Image(
                     painter = painterResource(id = R.mipmap.ic_launcher_foreground),
@@ -107,7 +138,7 @@ fun WalletWiseScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                item { Divider() }
+                item { HorizontalDivider() }
                 items(DrawerListItem) { item ->
                     NavigationDrawerItem(
                         label = { Text(text = item.title) },
@@ -126,7 +157,7 @@ fun WalletWiseScreen(
                         }
                     )
                 }
-                item { Divider() }
+                item { HorizontalDivider() }
                 items(GeneralDrawerItems) { item ->
                     NavigationDrawerItem(
                         label = { Text(text = item.title) },
@@ -147,7 +178,7 @@ fun WalletWiseScreen(
                 }
             }
         }
-    }, drawerState = drawerState) {
+    }, drawerState = drawerState, gesturesEnabled = false) {
         WalletWiseScaffold(navController, drawerState, navUiState, modifier)
     }
 
@@ -204,7 +235,6 @@ private fun WalletWiseScaffold(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun WalletWiseNavHost(
     navController: NavHostController,
@@ -247,9 +277,11 @@ private fun WalletWiseNavHost(
             }, modifier = Modifier.fillMaxSize())
         }
         composable(AccountDestination.route, enterTransition = {
-            fadeIn() + this.scaleInToFitContainer(contentScale = ContentScale.FillHeight)
+            fadeIn() + this.slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
         }, exitTransition = {
-            ExitTransition.Hold + fadeOut() + this.scaleOutToFitContainer(contentScale = ContentScale.FillHeight)
+            ExitTransition.KeepUntilTransitionsFinished + fadeOut() + this.slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Down
+            )
         }) {
             AccountScreen(onAdd = {
                 navController.navigate("${AddTransactionDestination.route}/$it/${true}")
@@ -259,7 +291,7 @@ private fun WalletWiseNavHost(
                 navController.navigate(AddAccountDestination.route)
             }, onAmountClick = {
                 navController.navigate("${HistoryDestination.route}/Account/$it")
-            })
+            }, onEdit = {})
         }
         composable(AddAccountDestination.route, enterTransition = {
             fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
@@ -270,38 +302,40 @@ private fun WalletWiseNavHost(
                 navController.navigateUp()
             })
         }
-        composable(AddTransactionDestination.routeWithArgs, arguments = listOf(
-            navArgument(AddTransactionDestination.accIdArg) {
-                type = NavType.LongType
-            },
-            navArgument(AddTransactionDestination.typeArg) {
-                type = NavType.BoolType
-            }
-        ), enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Down
-            )
-        }, exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Up
-            )
-        }) {
+        composable(
+            AddTransactionDestination.routeWithArgs, arguments = listOf(
+                navArgument(AddTransactionDestination.accIdArg) {
+                    type = NavType.LongType
+                },
+                navArgument(AddTransactionDestination.typeArg) {
+                    type = NavType.BoolType
+                }
+            ), enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down
+                )
+            }, exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up
+                )
+            }) {
             AddTransactionScreen(
                 navigateBack = { navController.navigateUp() })
         }
-        composable(AddTagDestination.routeWithArgs, arguments = listOf(
-            navArgument(AddTagDestination.typeArg) {
-                type = NavType.BoolType
-            }
-        ), enterTransition = {
-            fadeIn() + slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Up
-            )
-        }, exitTransition = {
-            ExitTransition.Hold + fadeOut() + slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Down
-            )
-        }) {
+        composable(
+            AddTagDestination.routeWithArgs, arguments = listOf(
+                navArgument(AddTagDestination.typeArg) {
+                    type = NavType.BoolType
+                }
+            ), enterTransition = {
+                fadeIn() + slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up
+                )
+            }, exitTransition = {
+                ExitTransition.KeepUntilTransitionsFinished + fadeOut() + slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down
+                )
+            }) {
             AddTagScreen(navigateBack = { navController.navigateUp() })
         }
         composable(
@@ -315,7 +349,7 @@ private fun WalletWiseNavHost(
                     AnimatedContentTransitionScope.SlideDirection.Up
                 )
             }, exitTransition = {
-                ExitTransition.Hold + fadeOut() + slideOutOfContainer(
+                ExitTransition.KeepUntilTransitionsFinished + fadeOut() + slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Down
                 )
             }) {
@@ -362,7 +396,7 @@ fun WalletWiseTopAppBar(
         if (backEnabled)
             IconButton(onClick = navigateBack) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )

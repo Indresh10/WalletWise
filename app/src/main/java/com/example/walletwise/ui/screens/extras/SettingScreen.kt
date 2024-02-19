@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.extras
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

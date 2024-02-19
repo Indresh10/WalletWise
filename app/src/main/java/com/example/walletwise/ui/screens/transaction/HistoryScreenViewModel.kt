@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -55,7 +55,7 @@ class BalanceScreenViewModel(
 
                 "AccountType" -> {
                     value?.let {
-                        walletDataRepository.getTransactionByAccountType(AccountType.values()[it.toInt()].name)
+                        walletDataRepository.getTransactionByAccountType(AccountType.entries[it.toInt()].name)
                             .filterNotNull().first()
                     } ?: emptyList()
                 }
@@ -107,9 +107,9 @@ class BalanceScreenViewModel(
 
     fun updateTagType(tagType: TagType?){
         viewModelScope.launch {
-            val transactions = if(tagType != null){
+            val transactions = if (tagType != null) {
                 walletDataRepository.getTransactionByTagType(tagType.type).first()
-            }else{
+            } else {
                 walletDataRepository.getTransactions().first()
             }
             calcAmount(transactions)
@@ -117,7 +117,12 @@ class BalanceScreenViewModel(
         }
     }
 
-    fun updateDateRange(timeLayout: TimeLayout=TimeLayout.Month, data:Int=0, start: String = "", end: String = "") {
+    fun updateDateRange(
+        timeLayout: TimeLayout = TimeLayout.Month,
+        data: Int = 0,
+        start: String = "",
+        end: String = ""
+    ) {
         val today = LocalDate.now()
         lateinit var startDate: String
         lateinit var endDate: String

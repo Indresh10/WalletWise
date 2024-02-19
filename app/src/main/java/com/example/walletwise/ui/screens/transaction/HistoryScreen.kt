@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -27,18 +27,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerDefaults
 import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -91,7 +91,7 @@ object HistoryDestination : NavigationDestination {
         get() = "History"
     const val keyArg = "keyArg"
     const val valueArg = "valueArg"
-    val routeWithArgs = "${route}/{$keyArg}/{$valueArg}"
+    val routeWithArgs = "$route/{$keyArg}/{$valueArg}"
 }
 
 @Composable
@@ -122,7 +122,7 @@ fun BalanceScreen(
         else {
             when (viewModel.getKey()) {
                 "AccountType" -> {
-                    val accountType = AccountType.values()
+                    val accountType = AccountType.entries.toTypedArray()
                     var selected by rememberSaveable {
                         mutableIntStateOf(0)
                     }
@@ -192,7 +192,7 @@ fun BalanceScreen(
                 }
 
                 "Time" -> {
-                    val timeLayout = TimeLayout.values()
+                    val timeLayout = TimeLayout.entries.toTypedArray()
                     var selected by rememberSaveable {
                         mutableIntStateOf(0)
                     }
@@ -338,7 +338,7 @@ fun BalanceScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Transactions", style = MaterialTheme.typography.titleLarge)
-        Divider()
+        HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
         TransactionList(
             dateGroupedTransaction = uiState.datedTransactions,
@@ -527,7 +527,7 @@ fun TransactionListItem(
                         label = { Text(text = data.tag.name) },
                         leadingIcon = {
                             Icon(
-                                imageVector = ImageType.values()[data.tag.icon].res,
+                                imageVector = ImageType.entries[data.tag.icon].res,
                                 contentDescription = null
                             )
                         },
@@ -555,11 +555,17 @@ fun NextPrevRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onPrev, enabled = prevEnable) {
-            Icon(imageVector = Icons.Filled.ArrowBackIos, contentDescription = "previous")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                contentDescription = "previous"
+            )
         }
         Text(text = text, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
         IconButton(onClick = onNext, enabled = nextEnable) {
-            Icon(imageVector = Icons.Filled.ArrowForwardIos, contentDescription = "next")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = "next"
+            )
         }
     }
 }
@@ -599,9 +605,10 @@ fun RangeDateRow(
                 )
             }, headline = {
                 DateRangePickerDefaults.DateRangePickerHeadline(
-                    state = datePickerState,
-                    dateFormatter = DatePickerFormatter(selectedDateSkeleton = "MMMdy"),
-                    modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
+                    selectedStartDateMillis = datePickerState.selectedStartDateMillis,
+                    selectedEndDateMillis = datePickerState.selectedEndDateMillis,
+                    displayMode = DisplayMode.Picker,
+                    dateFormatter = DatePickerDefaults.dateFormatter(selectedDateSkeleton = "MMMdy"),
                 )
             })
         else {

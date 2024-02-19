@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

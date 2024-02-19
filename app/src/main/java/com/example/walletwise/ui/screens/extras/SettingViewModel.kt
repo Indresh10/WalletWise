@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.extras
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

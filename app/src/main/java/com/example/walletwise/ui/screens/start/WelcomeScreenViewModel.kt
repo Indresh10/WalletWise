@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.start
 
 import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel

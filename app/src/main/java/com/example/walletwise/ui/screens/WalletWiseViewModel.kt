@@ -4,13 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.walletwise.data.PreferenceRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class WalletWiseViewModel(private val preferenceRepository: PreferenceRepository) : ViewModel() {
@@ -34,11 +30,15 @@ class WalletWiseViewModel(private val preferenceRepository: PreferenceRepository
             }
         }
     }
+
+    fun resetToLockScreen() {
+        uiState = NavUiState.LockState
+    }
 }
 
-sealed interface NavUiState{
-    object LoadingState:NavUiState
-    object WelcomeState:NavUiState
-    object LockState:NavUiState
-    object HomeState:NavUiState
+sealed interface NavUiState {
+    data object LoadingState : NavUiState
+    data object WelcomeState : NavUiState
+    data object LockState : NavUiState
+    data object HomeState : NavUiState
 }

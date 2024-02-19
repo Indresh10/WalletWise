@@ -6,15 +6,15 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.walletwise.WalletWiseApplication
-import com.example.walletwise.ui.screens.AccountScreenViewModel
-import com.example.walletwise.ui.screens.AddAccountViewModel
-import com.example.walletwise.ui.screens.AddTagViewModel
-import com.example.walletwise.ui.screens.AddTransactionViewModel
-import com.example.walletwise.ui.screens.BalanceScreenViewModel
-import com.example.walletwise.ui.screens.LockScreenViewModel
-import com.example.walletwise.ui.screens.SettingViewModel
 import com.example.walletwise.ui.screens.WalletWiseViewModel
-import com.example.walletwise.ui.screens.WelcomeScreenViewModel
+import com.example.walletwise.ui.screens.account.AccountScreenViewModel
+import com.example.walletwise.ui.screens.account.AddAccountViewModel
+import com.example.walletwise.ui.screens.extras.SettingViewModel
+import com.example.walletwise.ui.screens.start.LockScreenViewModel
+import com.example.walletwise.ui.screens.start.WelcomeScreenViewModel
+import com.example.walletwise.ui.screens.transaction.AddTagViewModel
+import com.example.walletwise.ui.screens.transaction.AddTransactionViewModel
+import com.example.walletwise.ui.screens.transaction.BalanceScreenViewModel
 
 object ViewModelProvider {
     val factory = viewModelFactory {

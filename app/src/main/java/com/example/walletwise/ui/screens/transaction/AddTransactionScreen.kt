@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.transaction
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -223,7 +223,7 @@ fun TagChipsList(tags: List<Tag>, onTagClick: (Long) -> Unit, modifier: Modifier
                 label = { Text(text = tag.name, overflow = TextOverflow.Ellipsis, maxLines = 1) },
                 leadingIcon = {
                     Icon(
-                        imageVector = ImageType.values()[tag.icon].res,
+                        imageVector = ImageType.entries[tag.icon].res,
                         contentDescription = tag.name
                     )
                 }

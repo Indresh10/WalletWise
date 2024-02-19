@@ -1,4 +1,4 @@
-package com.example.walletwise.ui.screens
+package com.example.walletwise.ui.screens.start
 
 
 import android.content.Context
@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Backspace
 import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.rounded.Backspace
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -43,7 +43,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -191,7 +190,7 @@ fun BtnRow(list: List<Int>, onNumberClick: (String) -> Unit, modifier: Modifier 
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Backspace,
+                        imageVector = Icons.AutoMirrored.Rounded.Backspace,
                         contentDescription = "backspace",
                         modifier = Modifier.offset(x = 2.dp)
                     )
