@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.rounded.FolderZip
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -337,7 +338,12 @@ fun BalanceScreen(
                 .padding(horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Transactions", style = MaterialTheme.typography.titleLarge)
+        Row {
+            Text(text = "Transactions", style = MaterialTheme.typography.titleLarge)
+            IconButton(onClick = { exportData() }) {
+                Icon(imageVector = Icons.Rounded.FolderZip, contentDescription = "Export Data")
+            }
+        }
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
         TransactionList(
@@ -346,6 +352,10 @@ fun BalanceScreen(
             enableDecimal
         )
     }
+}
+
+fun exportData() {
+
 }
 
 @Preview(showBackground = true)

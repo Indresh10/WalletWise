@@ -9,6 +9,7 @@ import com.example.walletwise.WalletWiseApplication
 import com.example.walletwise.ui.screens.WalletWiseViewModel
 import com.example.walletwise.ui.screens.account.AccountScreenViewModel
 import com.example.walletwise.ui.screens.account.AddAccountViewModel
+import com.example.walletwise.ui.screens.account.EditAccountViewModel
 import com.example.walletwise.ui.screens.extras.SettingViewModel
 import com.example.walletwise.ui.screens.start.LockScreenViewModel
 import com.example.walletwise.ui.screens.start.WelcomeScreenViewModel
@@ -19,10 +20,19 @@ import com.example.walletwise.ui.screens.transaction.BalanceScreenViewModel
 object ViewModelProvider {
     val factory = viewModelFactory {
         initializer {
-            AccountScreenViewModel(walletWiseApplication().appContainer.walletDataRepository,walletWiseApplication().appContainer.preferenceRepository)
+            AccountScreenViewModel(
+                walletWiseApplication().appContainer.walletDataRepository,
+                walletWiseApplication().appContainer.preferenceRepository
+            )
         }
         initializer {
             AddAccountViewModel(walletWiseApplication().appContainer.walletDataRepository)
+        }
+        initializer {
+            EditAccountViewModel(
+                this.createSavedStateHandle(),
+                walletWiseApplication().appContainer.walletDataRepository
+            )
         }
         initializer {
             AddTransactionViewModel(

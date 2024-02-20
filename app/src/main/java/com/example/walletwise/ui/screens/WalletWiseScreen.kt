@@ -71,6 +71,8 @@ import com.example.walletwise.ui.screens.account.AccountDestination
 import com.example.walletwise.ui.screens.account.AccountScreen
 import com.example.walletwise.ui.screens.account.AddAccountDestination
 import com.example.walletwise.ui.screens.account.AddAccountScreen
+import com.example.walletwise.ui.screens.account.EditAccountDestination
+import com.example.walletwise.ui.screens.account.EditAccountScreen
 import com.example.walletwise.ui.screens.extras.AboutScreen
 import com.example.walletwise.ui.screens.extras.AboutScreenDestination
 import com.example.walletwise.ui.screens.extras.SettingScreen
@@ -208,6 +210,7 @@ private fun WalletWiseScaffold(
                 else if (it == WelcomeDestination.route) WelcomeDestination.title
                 else if (it == SettingScreenDestination.route) SettingScreenDestination.title
                 else if (it == AboutScreenDestination.route) AboutScreenDestination.title
+                else if (it.startsWith(EditAccountDestination.route)) EditAccountDestination.title
                 else ""
             } ?: "",
             backEnabled = (navController.previousBackStackEntry != null) and (backStackEntry?.destination?.route != AccountDestination.route),
@@ -291,7 +294,17 @@ private fun WalletWiseNavHost(
                 navController.navigate(AddAccountDestination.route)
             }, onAmountClick = {
                 navController.navigate("${HistoryDestination.route}/Account/$it")
-            }, onEdit = {})
+            }, onEdit = {
+                navController.navigate("${EditAccountDestination.route}/$it")
+            })
+        }
+        composable(
+            EditAccountDestination.routeWithArgs, arguments = listOf(
+                navArgument(AddTransactionDestination.accIdArg) {
+                    type = NavType.LongType
+                })
+        ) {
+            EditAccountScreen(navigateBack = { navController.navigateUp() })
         }
         composable(AddAccountDestination.route, enterTransition = {
             fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
